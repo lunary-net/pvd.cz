@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psaní všemi deseti</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+        }
+        h1 {
+            margin: 0;
+        }
+        nav {
+            background-color: #555;
+            padding: 10px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+        }
+        .typing-test {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        #text-to-type {
+            font-size: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        #typing-area {
+            width: 100%;
+            height: 100px;
+            font-size: 18px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Naučte se psát všemi deseti</h1>
+    </header>
+    <nav>
+        <a href="#" onclick="setLevel(0)">Úroveň 1</a>
+        <a href="#" onclick="setLevel(1)">Úroveň 2</a>
+        <a href="#" onclick="setLevel(2)">Úroveň 3</a>
+        <a href="#" onclick="setLevel(3)">Úroveň 4</a>
+        <a href="#" onclick="setLevel(4)">Úroveň 5</a>
+    </nav>
+    <main>
+        <section class="typing-test">
+            <div id="level">Úroveň: 1</div>
+            <div id="text-to-type">abc</div>
+            <textarea id="typing-area" placeholder="Začněte psát zde..." autofocus></textarea>
+            <div class="results">
+                <p>Počet napsaných znaků: <span id="char-count">0</span></p>
+                <p>Čas: <span id="time">0</span> sekund</p>
+                <button onclick="resetTest()">Resetovat</button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        &copy; Dev. Vojtěch Vostřák 2024. Všechna práva vyhrazena.
+        <p>PVD = Psaní Všema Deseti</p>
+    </footer>
+    <script>
+        const levels = [
+            "abcdef",
+            "ghijkl",
+            "mnopqr",
+            "stuvwx",
+            "yz"
+        ];
+        let currentLevel = 0;
+        let textToType = getRandomLettersFromLevel(currentLevel);
+        let currentCharIndex = 0;
+        let startTime;
+        let sentenceMode = false;
+        let typingStarted = false;
+        const typingArea = document.getElementById('typing-area');
+        const charCountDisplay = document.getElementById('char-count');
+        const timeDisplay = document.getElementById('time');
+        const textToTypeDisplay = document.getElementById('text-to-type');
+        const levelDisplay = document.getElementById('level');
+
+        textToTypeDisplay.innerText = textToType;
+        levelDisplay.innerText = `Úroveň: ${currentLevel + 1}`;
+
+        typingArea.addEventListener('input', () => {
+            if (!typingStarted) {
+                startTime = new Date();
+                typingStarted = true;
+                setInterval(updateTime, 1000);
+            }
+            const typedChar = typingArea.value.slice(-1);
+            if (!sentenceMode) {
+                if (typedChar === textToType[currentCharIndex]) {
+                    currentCharIndex++;
+                    if (currentCharIndex === textToType.length) {
+                        textToType = getRandomLettersFromLevel(currentLevel);
+                        textToTypeDisplay.innerText = textToType;
+                        typingArea.value = '';
+                        currentCharIndex = 0;
+                    }
+                }
+            }
+            charCountDisplay.innerText = typingArea.value.length;
+        });
+
+        function updateTime() {
+            if (typingStarted) {
+                const elapsedTime = Math.floor((new Date() - startTime) / 1000);
+                timeDisplay.innerText = elapsedTime;
+            }
+        }
+
+        function resetTest() {
+            typingArea.value = '';
+            charCountDisplay.innerText = '0';
+            timeDisplay.innerText = '0';
+            startTime = null;
+            typingStarted = false;
+            currentCharIndex = 0;
+            sentenceMode = false;
+            textToType = getRandomLettersFromLevel(currentLevel);
+            textToTypeDisplay.innerText = textToType;
+            levelDisplay.innerText = `Úroveň: ${currentLevel + 1}`;
+        }
+
+        function setLevel(level) {
+            currentLevel = level;
+            resetTest();
+            sentenceMode = false;
+            textToType = getRandomLettersFromLevel(currentLevel);
+            textToTypeDisplay.innerText = textToType;
+            levelDisplay.innerText = `Úroveň: ${currentLevel + 1}`;
+        }
+
+        function getRandomLettersFromLevel(level) {
+            const possibleLetters = levels[level];
+            let result = '';
+            for (let i = 0; i < 5; i++) {
+                result += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
+            }
+            return result;
+        }
+    </script>
+</body>
+</html>
